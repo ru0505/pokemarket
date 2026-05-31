@@ -1,0 +1,87 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo - PokeMarket</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav style="background:#1e3c72;padding:20px 80px;display:flex;justify-content:space-between;align-items:center;">
+
+        <div class="logo">
+            <h1>PokeMarket</h1>
+        </div>
+
+        <ul style="display:flex;gap:30px;list-style:none;">
+            <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+            <li><a href="{% url 'catalogo' %}" style="color:#ffcb05;text-decoration:none;">Catalogo</a></li>
+            <li><a href="{% url 'carrito' %}" style="color:white;text-decoration:none;">Carrito</a></li>
+        </ul>
+
+        <div class="auth-buttons">
+            {% if request.user.is_authenticated %}
+                <span style="color:white;">Hola, {{ request.user.email }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Cerrar Sesion</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Iniciar Sesion</a>
+                <a href="{% url 'registro' %}" class="register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+
+    </nav>
+    <!-- CATALOGO -->
+    <section class="categories" style="padding-top:40px;">
+
+        <h2>Catalogo de Productos</h2>
+
+        <!-- FILTROS POR CATEGORIA -->
+        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:30px;flex-wrap:wrap;">
+            <a href="{% url 'catalogo' %}" class="filtro-btn {% if not categoria_activa %}filtro-activo{% endif %}">
+                Todos
+            </a>
+            {% for cat in categorias %}
+            <a href="{% url 'catalogo' %}?categoria={{ cat.id }}"
+            class="filtro-btn {% if categoria_activa == cat.id|stringformat:'s' %}filtro-activo{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- PRODUCTOS -->
+        <div class="cards">
+            {% for product in products %}
+            <div class="card">
+                <h3>{{ product.name }}</h3>
+                <p class="product-category">{{ product.category.name }}</p>
+                <p class="product-price">S/ {{ product.price }}</p>
+                {% if product.stock > 0 %}
+                    <p class="product-stock-ok">Stock: {{ product.stock }}</p>
+                {% else %}
+                    <p class="product-stock-empty">Sin stock</p>
+                {% endif %}
+                <a href="{% url 'agregar_carrito' product.id %}">
+                    <button class="btn-carrito">
+                        Agregar al carrito
+                    </button>
+                </a>
+            </div>
+            {% empty %}
+            <p>No hay productos en esta categoria.</p>
+            {% endfor %}
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <h3>PokeMarket</h3>
+        <p>2026 PokeMarket. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

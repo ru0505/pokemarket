@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<div class="auth-container">
+    <form class="auth-form" method="POST" action="{% url 'registro' %}">
+        {% csrf_token %}
+
+        <div class="logo-auth">
+            <h1>Poke<span>Market</span></h1>
+        </div>
+
+        <h2>Crear cuenta</h2>
+        <p>Únete a PokeMarket</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="auth-error">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <input type="email" name="email" placeholder="Correo electrónico" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <input type="password" name="confirm_password" placeholder="Confirmar contraseña" required>
+
+        <button type="submit">Crear cuenta</button>
+
+        <div class="auth-link">
+            <a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

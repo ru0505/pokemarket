@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - PokeMarket</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <nav style="background:#1e3c72;padding:20px 80px;display:flex;justify-content:space-between;align-items:center;">
+        <div class="logo">
+            <h1>PokeMarket</h1>
+        </div>
+        <ul style="display:flex;gap:30px;list-style:none;">
+            <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+            <li><a href="{% url 'catalogo' %}" style="color:white;text-decoration:none;">Catalogo</a></li>
+            <li><a href="{% url 'carrito' %}" style="color:white;text-decoration:none;">Carrito</a></li>
+            <li><a href="{% url 'mis_pedidos' %}" style="color:#ffcb05;text-decoration:none;">Mis Pedidos</a></li>
+        </ul>
+        <div class="auth-buttons">
+            {% if request.user.is_authenticated %}
+                <span style="color:white;">Hola, {{ request.user.email }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Cerrar Sesion</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Iniciar Sesion</a>
+                <a href="{% url 'registro' %}" class="register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <section class="categories">
+        <h2>Mis Pedidos</h2>
+
+        {% if orders %}
+            {% for order in orders %}
+            <div class="card" style="margin-bottom:20px;text-align:left;">
+                <p><strong>Pedido #{{ order.id }}</strong></p>
+                <p>Estado: <span style="color:#1e3c72;font-weight:bold;">
+                    {% if order.status == 'pending' %}Pendiente
+                    {% elif order.status == 'paid' %}Pagado
+                    {% elif order.status == 'preparing' %}Preparando
+                    {% elif order.status == 'delivered' %}Entregado
+                    {% elif order.status == 'cancelled' %}Cancelado
+                    {% endif %}
+                </span></p>
+                <p>Total: <span style="font-weight:bold;">S/ {{ order.total }}</span></p>
+                <p>Fecha: {{ order.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="margin-top:30px;color:#666;">No tienes pedidos aun. <a href="{% url 'catalogo' %}">Ver catalogo</a></p>
+        {% endif %}
+
+    </section>
+
+    <footer>
+        <h3>PokeMarket</h3>
+        <p>2026 PokeMarket. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

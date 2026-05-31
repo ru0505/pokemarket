@@ -1,0 +1,194 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokeMarket</title>
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="hero">
+
+        <nav>
+
+            <div class="logo">
+                <h1>PokeMarket</h1>
+            </div>
+
+            <ul>
+                <li>Inicio</li>
+                <li>Cartas</li>
+                <li>Colecciones</li>
+                <li>Tiendas</li>
+                <li>Contacto</li>
+            </ul>
+
+            <div class="auth-buttons">
+                {% if request.user.is_authenticated %}
+                    <span style="color:white;">Hola, {{ request.user.email }}</span>
+                    <a href="{% url 'logout' %}" class="login-btn">
+                        Cerrar Sesión
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-btn">
+                        Iniciar Sesión
+                    </a>
+                    <a href="{% url 'registro' %}" class="register-btn">
+                        Registrarse
+                    </a>
+                {% endif %}
+            </div>
+
+        </nav>
+
+        <!-- HERO -->
+        <div class="hero-content">
+
+            <div class="left">
+
+                <span class="badge">
+                    Marketplace Pokemon #1
+                </span>
+
+                <h2>
+                    Compra y vende cartas Pokemon de forma segura
+                </h2>
+
+                <p>
+                    Encuentra cartas raras, boosters,
+                    colecciones y productos sellados
+                    al mejor precio.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="{% url 'catalogo' %}">
+                        <button>
+                            Explorar Cartas
+                        </button>
+                    </a>
+
+                    <button class="secondary">
+                        Vender Ahora
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- CATEGORIAS -->
+    <section class="categories">
+
+        <h2>Categorias Populares</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Cartas Sueltas</h3>
+            </div>
+
+            <div class="card">
+                <h3>Booster Packs</h3>
+            </div>
+
+            <div class="card">
+                <h3>Booster Boxes</h3>
+            </div>
+
+            <div class="card">
+                <h3>Productos Sellados</h3>
+            </div>
+
+            <div class="card">
+                <h3>Colecciones</h3>
+            </div>
+
+            <div class="card">
+                <h3>Accesorios</h3>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- PRODUCTOS POPULARES -->
+    <section class="trending">
+
+        <h2>Productos Destacados</h2>
+
+        <div class="trend-grid">
+
+            {% for product in products %}
+            <div class="product">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.category.name }}</p>
+                <p>S/ {{ product.price }}</p>
+                <p>Stock: {{ product.stock }}</p>
+            </div>
+            {% empty %}
+            <p>No hay productos disponibles aun.</p>
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="features">
+
+        <h2>Por que elegir PokeMarket?</h2>
+
+        <div class="feature-grid">
+
+            <div class="feature">
+                Gestion de Inventario
+            </div>
+
+            <div class="feature">
+                Control de Stock
+            </div>
+
+            <div class="feature">
+                Gestion de Pedidos
+            </div>
+
+            <div class="feature">
+                Multi Tiendas
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <h3>PokeMarket</h3>
+
+        <p>
+            El marketplace para coleccionistas y vendedores Pokemon.
+        </p>
+
+        <br>
+
+        <p>
+            2026 PokeMarket. Todos los derechos reservados.
+        </p>
+
+    </footer>
+
+</body>
+
+</html>
