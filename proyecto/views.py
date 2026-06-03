@@ -1,9 +1,51 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User, Product, Category, Cart, CartItem, Order, OrderItem
 from django.db import transaction
+from .models import User, Product, Category, Cart, CartItem, Order, OrderItem, StockMovement
 
+def stock(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    productos = Product.objects.filter(is_active=True)
+    movimientos = StockMovement.objects.all().order_by('-created_at')[:10]
+    
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        movement_type = request.POST.get('movement_type')
+        quantity = int(request.POST.get('quantity'))
+        reason = request.POST.get('reason')
+        
+        product = Product.objects.get(id=product_id)
+        
+        if movement_type == 'in':
+            product.stock += quantity
+        elif movement_type == 'out':
+            if product.stock < quantity:
+                messages.error(request, 'Stock insuficiente.')
+                return redirect('stock')
+            product.stock -= quantity
+        
+        product.save(update_fields=['stock'])
+        
+        StockMovement.objects.create(
+            tenant=product.tenant,
+            product=product,
+            movement_type=movement_type,
+            quantity=quantity,
+            reason=reason,
+        )
+        
+        messages.success(request, 'Movimiento registrado correctamente.')
+        return redirect('stock')
+    
+    return render(request, 'stock.html', {
+        'productos': productos,
+        'movimientos': movimientos,
+    })
+    
+    
 def confirmar_pedido(request):
     if not request.user.is_authenticated:
         return redirect('login')

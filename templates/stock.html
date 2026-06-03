@@ -1,0 +1,122 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock - PokeMarket</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <nav style="background:#1e3c72;padding:20px 80px;display:flex;justify-content:space-between;align-items:center;">
+        <div class="logo">
+            <h1>PokeMarket</h1>
+        </div>
+        <ul style="display:flex;gap:30px;list-style:none;">
+            <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+            <li><a href="{% url 'catalogo' %}" style="color:white;text-decoration:none;">Catalogo</a></li>
+            <li><a href="{% url 'carrito' %}" style="color:white;text-decoration:none;">Carrito</a></li>
+            <li><a href="{% url 'mis_pedidos' %}" style="color:white;text-decoration:none;">Mis Pedidos</a></li>
+            <li><a href="{% url 'dashboard' %}" style="color:white;text-decoration:none;">Dashboard</a></li>
+            <li><a href="{% url 'stock' %}" style="color:#ffcb05;text-decoration:none;">Stock</a></li>
+        </ul>
+        <div class="auth-buttons">
+            {% if request.user.is_authenticated %}
+                <span style="color:white;">Hola, {{ request.user.email }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Cerrar Sesion</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Iniciar Sesion</a>
+                <a href="{% url 'registro' %}" class="register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <section class="categories">
+
+        <h2>Control de Stock</h2>
+
+        <!-- FORMULARIO -->
+        <div class="card" style="max-width:600px;margin:30px auto;text-align:left;">
+            <h3 style="margin-bottom:20px;color:#1e3c72;">Registrar Movimiento</h3>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="auth-error" style="color:{% if message.tags == 'success' %}green{% else %}red{% endif %};">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'stock' %}">
+                {% csrf_token %}
+
+                <select name="product_id" style="width:100%;padding:12px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+                    {% for p in productos %}
+                    <option value="{{ p.id }}">{{ p.name }} - Stock actual: {{ p.stock }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="movement_type" style="width:100%;padding:12px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+                    <option value="in">Entrada</option>
+                    <option value="out">Salida</option>
+                </select>
+
+                <input type="number" name="quantity" placeholder="Cantidad" min="1"
+                    style="width:100%;padding:12px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+
+                <input type="text" name="reason" placeholder="Motivo"
+                    style="width:100%;padding:12px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+
+                <button type="submit" style="width:100%;background:#ffcb05;color:#222;padding:15px;border-radius:12px;font-size:16px;font-weight:700;">
+                    Registrar
+                </button>
+            </form>
+        </div>
+
+        <!-- HISTORIAL -->
+        <h2 style="margin-bottom:20px;">Ultimos Movimientos</h2>
+
+        {% if movimientos %}
+        <table style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr style="background:#1e3c72;color:white;">
+                    <th style="padding:15px;">Producto</th>
+                    <th style="padding:15px;">Tipo</th>
+                    <th style="padding:15px;">Cantidad</th>
+                    <th style="padding:15px;">Motivo</th>
+                    <th style="padding:15px;">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movimientos %}
+                <tr style="border-bottom:1px solid #e5e5e5;text-align:center;">
+                    <td style="padding:15px;">{{ m.product.name }}</td>
+                    <td style="padding:15px;">
+                        {% if m.movement_type == 'in' %}
+                            <span style="color:green;font-weight:bold;">Entrada</span>
+                        {% else %}
+                            <span style="color:red;font-weight:bold;">Salida</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:15px;">{{ m.quantity }}</td>
+                    <td style="padding:15px;">{{ m.reason }}</td>
+                    <td style="padding:15px;">{{ m.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#666;">No hay movimientos registrados aun.</p>
+        {% endif %}
+
+    </section>
+
+    <footer>
+        <h3>PokeMarket</h3>
+        <p>2026 PokeMarket. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
