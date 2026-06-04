@@ -2,8 +2,36 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db import transaction
-from .models import User, Product, Category, Cart, CartItem, Order, OrderItem, StockMovement
+from .models import User, Product, Category, Cart, CartItem, Order, OrderItem, StockMovement, Tenant
 
+def catalogo(request):
+    categoria_id = request.GET.get('categoria')
+    tenant_id = request.GET.get('tienda')
+    busqueda = request.GET.get('q', '')
+    tiendas = Tenant.objects.filter(is_active=True)
+    products = Product.objects.filter(is_active=True)
+    
+    if tenant_id:
+        products = products.filter(tenant_id=tenant_id)
+        categorias = Category.objects.filter(tenant_id=tenant_id)
+    else:
+        categorias = Category.objects.all()
+    
+    if categoria_id:
+        products = products.filter(category_id=categoria_id)
+    
+    if busqueda:
+        products = products.filter(name__icontains=busqueda)
+    
+    return render(request, 'catalogo.html', {
+        'products': products,
+        'categorias': categorias,
+        'tiendas': tiendas,
+        'categoria_activa': categoria_id,
+        'tienda_activa': tenant_id,
+        'busqueda': busqueda,
+    })
+    
 def stock(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -154,20 +182,7 @@ def eliminar_carrito(request, item_id):
     
     return redirect('carrito')
 
-def catalogo(request):
-    categoria_id = request.GET.get('categoria')
-    categorias = Category.objects.all()
-    products = Product.objects.filter(is_active=True)
-    
-    if categoria_id:
-        products = products.filter(category_id=categoria_id)
-    
-    return render(request, 'catalogo.html', {
-        'products': products,
-        'categorias': categorias,
-        'categoria_activa': categoria_id,
-    })
-    
+
 def home(request):
     products = Product.objects.filter(is_active=True)[:6]
     return render(request, 'home.html', {'products': products})
@@ -190,7 +205,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 def registro_view(request):
     if request.user.is_authenticated:
@@ -214,4 +229,79 @@ def registro_view(request):
         return redirect('home')
     
     return render(request, 'registro.html')
+ 
+ # vender productos 
+def venta(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        stock = request.POST.get('stock')
+        category_id = request.POST.get('category_id')
+        imagen = request.FILES.get('imagen')
+        
+        category = Category.objects.get(id=category_id)
+        
+        Product.objects.create(
+            tenant=category.tenant,
+            category=category,
+            name=name,
+            description=description,
+            price=price,
+            stock=stock,
+            imagen=imagen,
+            is_active=True,
+        )
+        
+        messages.success(request, 'Producto publicado correctamente.')
+        return redirect('mproductos_vendedor.html')
+    
+    categorias = Category.objects.all()
+    return render(request, 'venta.html', {'categorias': categorias})
 
+def productos_vendedor(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    productos = Product.objects.filter(is_active=True)
+    return render(request, 'productos_vendedor.html', {'productos': productos})
+
+def tiendas(request):
+    tiendas = Tenant.objects.filter(is_active=True)
+    return render(request, 'tiendas.html', {'tiendas': tiendas})
+
+def cartas(request):
+    products = Product.objects.filter(is_active=True, category__name__icontains='carta')
+    return render(request, 'cartas.html', {'products': products})
+
+def colecciones(request):
+    categoria_id = request.GET.get('categoria')
+    categorias = Category.objects.all()
+    products = Product.objects.filter(is_active=True)
+    
+    if categoria_id:
+        products = products.filter(category_id=categoria_id)
+    
+    return render(request, 'colecciones.html', {'products': products, 'categorias': categorias})
+
+def contacto(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        email = request.POST.get('email')
+        asunto = request.POST.get('asunto')
+        mensaje = request.POST.get('mensaje')
+        
+        from django.core.mail import send_mail
+        send_mail(
+            f'{asunto} - de {nombre}',
+            mensaje,
+            email,
+            ['tu_correo@gmail.com'],
+        )
+        messages.success(request, 'Mensaje enviado correctamente.')
+        return redirect('contacto')
+    
+    return render(request, 'contacto.html')

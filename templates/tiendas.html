@@ -1,0 +1,66 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiendas - PokeMarket</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <nav style="background:#1e3c72;padding:20px 80px;display:flex;justify-content:space-between;align-items:center;">
+        <div class="logo">
+            <h1>PokeMarket</h1>
+        </div>
+        <ul style="display:flex;gap:30px;list-style:none;">
+            <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+            <li><a href="{% url 'cartas' %}" style="color:white;text-decoration:none;">Cartas</a></li>
+            <li><a href="{% url 'colecciones' %}" style="color:white;text-decoration:none;">Colecciones</a></li>
+            <li><a href="{% url 'tiendas' %}" style="color:#ffcb05;text-decoration:none;">Tiendas</a></li>
+            <li><a href="{% url 'contacto' %}" style="color:white;text-decoration:none;">Contacto</a></li>
+        </ul>
+        <div class="auth-buttons">
+            {% if request.user.is_authenticated %}
+                <span style="color:white;">Hola, {{ request.user.email }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Cerrar Sesion</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Iniciar Sesion</a>
+                <a href="{% url 'registro' %}" class="register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <section class="categories">
+        <h2>Nuestras Tiendas</h2>
+
+        <div class="cards" style="margin-top:30px;">
+            {% for tienda in tiendas %}
+            <div class="card">
+                <h3 style="color:#1e3c72;font-size:22px;margin-bottom:10px;">{{ tienda.name }}</h3>
+                <p style="color:#666;margin-bottom:15px;">Tienda verificada en PokeMarket</p>
+                {% if tienda.is_active %}
+                    <p style="color:green;font-weight:bold;margin-bottom:15px;">Activa</p>
+                {% else %}
+                    <p style="color:red;font-weight:bold;margin-bottom:15px;">Inactiva</p>
+                {% endif %}
+                <a href="{% url 'catalogo' %}?tienda={{ tienda.id }}"
+                   style="display:block;background:#ffcb05;color:#222;padding:12px;border-radius:12px;text-decoration:none;font-weight:bold;text-align:center;">
+                    Ver productos
+                </a>
+            </div>
+            {% empty %}
+            <p>No hay tiendas disponibles.</p>
+            {% endfor %}
+        </div>
+
+    </section>
+
+    <footer>
+        <h3>PokeMarket</h3>
+        <p>2026 PokeMarket. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

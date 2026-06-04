@@ -113,7 +113,7 @@ button:hover{
     transform:translateY(-3px);
 }
 
-.secondary{
+.secundario{
     background:white;
     color:#1e3c72;
 }
@@ -130,22 +130,34 @@ button:hover{
     font-size:40px;
 }
 
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-}
-
-.card{
-    background:white;
-    padding:40px;
-    border-radius:16px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
-    transition:0.3s;
-}
-
 .card:hover{
     transform:translateY(-5px);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 300px));
+    gap: 20px;
+    justify-content: start;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: 0.3s;
+    overflow: hidden;
+    width: 100%;
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: block;
 }
 
 /* TENDENCIAS */

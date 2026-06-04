@@ -1,0 +1,89 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vender - PokeMarket</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <nav style="background:#1e3c72;padding:20px 80px;display:flex;justify-content:space-between;align-items:center;">
+        <div class="logo">
+            <h1>PokeMarket</h1>
+        </div>
+        <ul style="display:flex;gap:30px;list-style:none;">
+            <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+            <li><a href="{% url 'catalogo' %}" style="color:white;text-decoration:none;">Catalogo</a></li>
+            <li><a href="{% url 'mis_productos' %}" style="color:white;text-decoration:none;">Mis Productos</a></li>
+            <li><a href="{% url 'vender' %}" style="color:#ffcb05;text-decoration:none;">Vender</a></li>
+        </ul>
+        <div class="auth-buttons">
+            {% if request.user.is_authenticated %}
+                <span style="color:white;">Hola, {{ request.user.email }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Cerrar Sesion</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Iniciar Sesion</a>
+                <a href="{% url 'registro' %}" class="register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-form" style="max-width:550px;">
+
+            <div class="logo-auth">
+                <h1>Poke<span>Market</span></h1>
+            </div>
+
+            <h2>Publicar Producto</h2>
+            <p>Completa los datos de tu producto</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        <p style="color:green;text-align:center;margin-bottom:10px;">{{ message }}</p>
+                    {% else %}
+                        <p class="auth-error">{{ message }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'vender' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <input type="text" name="name" placeholder="Nombre del producto" required>
+
+                <textarea name="description" placeholder="Descripcion"
+                    style="width:100%;padding:14px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;resize:vertical;min-height:100px;"></textarea>
+
+                <input type="number" name="price" placeholder="Precio (S/)" step="0.01" min="0" required>
+
+                <input type="number" name="stock" placeholder="Stock disponible" min="0" required>
+
+                <select name="category_id" style="width:100%;padding:14px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}">{{ cat.name }} - {{ cat.tenant.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label style="display:block;margin-bottom:8px;font-weight:600;color:#333;">Imagen del producto</label>
+                <input type="file" name="imagen" accept="image/*"
+                    style="width:100%;padding:10px;margin-bottom:15px;border:2px solid #e5e5e5;border-radius:12px;font-size:15px;">
+
+                <button type="submit">Publicar Producto</button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <footer>
+        <h3>PokeMarket</h3>
+        <p>2026 PokeMarket. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

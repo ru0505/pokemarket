@@ -23,11 +23,11 @@
             </div>
 
             <ul>
-                <li>Inicio</li>
-                <li>Cartas</li>
-                <li>Colecciones</li>
-                <li>Tiendas</li>
-                <li>Contacto</li>
+                <li><a href="{% url 'home' %}" style="color:white;text-decoration:none;">Inicio</a></li>
+                <li><a href="{% url 'cartas' %}" style="color:white;text-decoration:none;">Cartas</a></li>
+                <li><a href="{% url 'colecciones' %}" style="color:white;text-decoration:none;">Colecciones</a></li>
+                <li><a href="{% url 'tiendas' %}" style="color:white;text-decoration:none;">Tiendas</a></li>
+                <li><a href="{% url 'contacto' %}" style="color:white;text-decoration:none;">Contacto</a></li>
             </ul>
 
             <div class="auth-buttons">
@@ -75,9 +75,19 @@
                         </button>
                     </a>
 
-                    <button class="secondary">
-                        Vender Ahora
-                    </button>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'vender' %}">
+                            <button class="secondary">
+                                Vender Ahora
+                            </button>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}">
+                            <button class="secondary">
+                                Vender Ahora
+                            </button>
+                        </a>
+                    {% endif %}
 
                 </div>
 
